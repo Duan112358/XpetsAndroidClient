@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InlinedApi">
+        <ignore path="src\com\emacs\pulltorefresh\PullToRefreshBase.java" />
+    </issue>
+    <issue id="ViewConstructor">
+        <ignore path="src\com\emacs\pulltorefresh\utils\RotateLoadingLayout.java" />
+    </issue>
+</lint>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/thumbnail"
+    android:layout_width="fill_parent"
+    android:layout_height="@dimen/image_thumbnail_height"
+    android:adjustViewBounds="true"
+    android:scaleType="centerCrop"
+    android:contentDescription="@string/logo"/>

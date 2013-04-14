@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InlinedApi">
+        <ignore path="src\com\generpoint\xpets\Main.java" />
+    </issue>
+    <issue id="NewApi">
+        <ignore path="src\com\generpoint\xpets\Main.java" />
+        <ignore path="src\com\generpoint\xpets\adapters\ImagesSectionFragment.java" />
+    </issue>
+</lint>
