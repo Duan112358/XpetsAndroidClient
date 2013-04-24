@@ -27,4 +27,5 @@ public class TagDetailsActivity extends FragmentActivity {
 			ft.commit();
 		}
 	}
+	
 }

@@ -1,6 +1,7 @@
 package com.emacs.xpets.fragments;
 
 import com.emacs.pulltorefresh.PullToRefreshBase;
+import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
 import com.emacs.pulltorefresh.PullToRefreshGridView;
 import com.emacs.xpets.TagDetailsActivity;
 import com.emacs.xpets.utils.Constants;
@@ -29,6 +30,14 @@ public class GridTagsFragment extends GridFragment<String> {
 		mAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_list_item_1, mListItems);
 		isString = true;
+
+		if (!Utils.isNetworkAvailable(getActivity())) {
+			mListItems.addAll(Utils.getOfflineDataSet(getActivity(),
+					Constants.GET_TAGS));
+			mAdapter.notifyDataSetChanged();
+		} else {
+			loadData(DataType.AllTags);
+		}
 	}
 
 	@Override
@@ -40,6 +49,7 @@ public class GridTagsFragment extends GridFragment<String> {
 
 		ptrGridView.setAdapter(mAdapter);
 		ptrGridView.setOnRefreshListener(this);
+		ptrGridView.setMode(Mode.PULL_FROM_END);
 
 		ptrGridView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -54,13 +64,6 @@ public class GridTagsFragment extends GridFragment<String> {
 			}
 		});
 
-		if (!Utils.isNetworkAvailable(getActivity())) {
-			mListItems.addAll(Utils.getOfflineDataSet(getActivity(),
-					Constants.GET_TAGS));
-			mAdapter.notifyDataSetChanged();
-		} else {
-			loadData(DataType.AllTags);
-		}
 		return rootView;
 	}
 
@@ -77,6 +80,11 @@ public class GridTagsFragment extends GridFragment<String> {
 
 	@Override
 	public void onPullDownToRefresh(PullToRefreshBase<GridView> refreshView) {
+
+	}
+
+	@Override
+	public void onPullUpToRefresh(PullToRefreshBase<GridView> refreshView) {
 		String label = DateUtils.formatDateTime(this.getActivity(),
 				System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
 						| DateUtils.FORMAT_SHOW_DATE
@@ -88,17 +96,10 @@ public class GridTagsFragment extends GridFragment<String> {
 	}
 
 	@Override
-	public void onPullUpToRefresh(PullToRefreshBase<GridView> refreshView) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (mKeys.size() > 0) {
-			Utils.saveStringSet(getActivity(), Constants.GET_TAGS,
-					mKeys);
+			Utils.saveStringSet(getActivity(), Constants.GET_TAGS, mKeys);
 		}
 	}
 }

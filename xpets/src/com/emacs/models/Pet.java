@@ -2,10 +2,7 @@ package com.emacs.models;
 
 import java.util.Arrays;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class Pet implements Parcelable {
+public class Pet {
 	private String key;
 	private String[] tags;
 	private String title;
@@ -67,45 +64,4 @@ public class Pet implements Parcelable {
 		}
 		return false;
 	}
-
-	public Pet(Parcel in) {
-		super();
-		readFromParcel(in);
-	}
-
-	public Pet() {
-	}
-
-	public static final Parcelable.Creator<Pet> CREATOR = new Parcelable.Creator<Pet>() {
-		public Pet createFromParcel(Parcel in) {
-			return new Pet(in);
-		}
-
-		public Pet[] newArray(int size) {
-
-			return new Pet[size];
-		}
-
-	};
-
-	public void readFromParcel(Parcel in) {
-		key = in.readString();
-		title = in.readString();
-		in.readStringArray(tags);
-		thumbnail = in.readString();
-		photo = in.readString();
-	}
-
-	public int describeContents() {
-		return 0;
-	}
-
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(title);
-		dest.writeString(key);
-		dest.writeString(thumbnail);
-		dest.writeString(photo);
-		dest.writeStringArray(tags);
-	}
-
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">越宠</string>
+    <string name="action_settings">Settings</string>
+    <string name="item_image_desc">pet image</string>
+    <string name="logo">Logo</string>
+    <string name="latest">最新</string>
+    <string name="recommend">推荐</string>
+    <string name="tags">标签墙</string>
+    <string name="tags_details">标签</string>
+    <string name="network_error">网络不可用</string>
+    <string name="network_error_content">网络不可用，请检查你的网络连接</string>
+    <string name="no_network_connection_toast">网络不可用</string>
+    <string name="cache_clear_completed">缓存清理成功</string>
+    <string name="clear_cache">清理缓存</string>
+    <string name="menu_item_clear_memory_cache">清理内存</string>
+    <string name="menu_item_clear_disc_cache">清除缓存</string>
+    <string name="menu_share">分享</string>
+	<string name="share_error">亲， 此图片暂时无法分享</string>
+</resources>

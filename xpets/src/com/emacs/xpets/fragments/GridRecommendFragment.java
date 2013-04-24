@@ -31,6 +31,18 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
+		
+		if (!Utils.isNetworkAvailable(getActivity())) {
+			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
+					Constants.GET_RECOMMEND);
+			if (keys != null && keys.size() > 0) {
+				mListItems.addAll(new DataManager(getActivity())
+						.getPetsByIDs(keys));
+				mAdapter.notifyDataSetChanged();
+			}
+		} else {
+			loadData(-1, Constants.PAGE_SIZE);
+		}
 	}
 
 	@Override
@@ -58,17 +70,7 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 		ptrGridView.setOnRefreshListener(this);
 		ptrGridView.setAdapter(mAdapter);
 
-		if (!Utils.isNetworkAvailable(getActivity())) {
-			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
-					Constants.GET_RECOMMEND);
-			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(new DataManager(getActivity())
-						.getPetsByIDs(keys));
-				mAdapter.notifyDataSetChanged();
-			}
-		} else {
-			loadData(-1, Constants.PAGE_SIZE);
-		}
+		
 		return rootView;
 	}
 

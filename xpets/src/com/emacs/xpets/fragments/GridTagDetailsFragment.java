@@ -3,7 +3,6 @@ package com.emacs.xpets.fragments;
 import java.util.Set;
 
 import com.emacs.data.DataManager;
-import com.emacs.http.AsyncHttpResponseHandler;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -37,6 +36,18 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
 		currentTag = getArguments().getString("tag");
 		MLog.i(currentTag);
+
+		if (!Utils.isNetworkAvailable(getActivity())) {
+			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
+					currentTag);
+			if (keys != null && keys.size() > 0) {
+				mListItems.addAll(new DataManager(getActivity())
+						.getPetsByIDs(keys));
+				mAdapter.notifyDataSetChanged();
+			}
+		} else {
+			loadData(currentTag, "", 0, Constants.PAGE_SIZE);
+		}
 	}
 
 	@Override
@@ -64,18 +75,6 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 		ptrGridView.setOnRefreshListener(this);
 		ptrGridView.setAdapter(mAdapter);
 
-		if (!Utils.isNetworkAvailable(getActivity())) {
-			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
-					currentTag);
-			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(new DataManager(getActivity())
-						.getPetsByIDs(keys));
-				mAdapter.notifyDataSetChanged();
-			}
-		} else {
-			loadData(currentTag, "", 0, Constants.PAGE_SIZE);
-		}
-
 		return rootView;
 	}
 
@@ -84,8 +83,7 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 		params.put("machine", Utils.getMachineKey());
 		params.put("from", "android:" + Build.VERSION.RELEASE);
 
-		client.get(Utils.getBaseUrl() + "stats/tag?", params,
-				new AsyncHttpResponseHandler());
+		client.get(Utils.getBaseUrl() + "stats/tag?", params, null);
 	}
 
 	private void loadData(String tag, String key, int index, int pageSize) {
@@ -102,8 +100,8 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 	@Override
 	protected void onDataLoadingSuccessed() {
 		MLog.i("Loading recommend completed.");
-		mAdapter.notifyDataSetChanged();
 		sendTagsStats();
+		mAdapter.notifyDataSetChanged();
 	}
 
 	@Override

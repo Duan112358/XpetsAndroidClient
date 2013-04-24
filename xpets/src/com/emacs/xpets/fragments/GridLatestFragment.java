@@ -4,6 +4,7 @@ import java.util.Set;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class GridLatestFragment extends GridFragment<Pet> {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
+
+		init();
 	}
 
 	@Override
@@ -56,7 +59,6 @@ public class GridLatestFragment extends GridFragment<Pet> {
 			}
 		});
 
-		init();
 		return v;
 	}
 
@@ -85,6 +87,13 @@ public class GridLatestFragment extends GridFragment<Pet> {
 
 	@Override
 	public void onPullDownToRefresh(PullToRefreshBase<GridView> refreshView) {
+		String label = DateUtils.formatDateTime(this.getActivity(),
+				System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
+						| DateUtils.FORMAT_SHOW_DATE
+						| DateUtils.FORMAT_ABBREV_ALL);
+		// Update the LastUpdatedLabel
+		refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+		
 		String key = "";
 		isRefreshing = true;
 		if (mListItems.size() > 0) {
