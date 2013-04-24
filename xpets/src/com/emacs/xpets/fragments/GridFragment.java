@@ -56,7 +56,7 @@ public abstract class GridFragment<T> extends BaseFragment implements
 		} else {
 			isloading = true;
 
-			params.put("machine", Utils.getMachineKey());
+			params.put("machine", Utils.getMachineKey(getActivity()));
 			params.put("from", "android:" + Build.VERSION.RELEASE);
 
 			if (BASE_URL == "") {
@@ -116,7 +116,7 @@ public abstract class GridFragment<T> extends BaseFragment implements
 	}
 
 	private void loadBaseUrl(final DataType url) {
-		if(client == null){
+		if (client == null) {
 			client = new AsyncHttpClient();
 		}
 		client.get(REQUEST_URL, params, new AsyncHttpResponseHandler() {
@@ -128,13 +128,17 @@ public abstract class GridFragment<T> extends BaseFragment implements
 			@Override
 			public void onSuccess(int statusCode, String content) {
 				String baseUrl = content.substring(1, content.length() - 1);
+				
+				BASE_URL = baseUrl;
+				
 				MLog.i(baseUrl);
-				String original = System.getProperty("BASE_URL");
+				String original = Utils.getBaseUrl(getActivity());
+				
 				if (original == null || !original.equalsIgnoreCase(baseUrl)) {
-					System.setProperty("BASE_URL", baseUrl);
+					Utils.saveBaseUrl(getActivity(), baseUrl);
 				} else {
 					if (original != content) {
-						System.setProperty("BASE_URL", baseUrl);
+						Utils.saveBaseUrl(getActivity(), baseUrl);
 					}
 				}
 				beginDataLoading(url);
@@ -144,11 +148,11 @@ public abstract class GridFragment<T> extends BaseFragment implements
 	}
 
 	private void beginDataLoading(DataType url) {
-		if(client == null){
+		if (client == null) {
 			client = new AsyncHttpClient();
 		}
-		
-		client.get(Utils.getBaseUrl() + url.getUrl(), params,
+
+		client.get(Utils.getBaseUrl(getActivity()) + url.getUrl(), params,
 				new JsonHttpResponseHandler() {
 
 					@Override

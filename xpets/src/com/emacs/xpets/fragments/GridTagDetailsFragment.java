@@ -80,10 +80,10 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 
 	private void sendTagsStats() {
 		params.put("name", currentTag);
-		params.put("machine", Utils.getMachineKey());
+		params.put("machine", Utils.getMachineKey(getActivity()));
 		params.put("from", "android:" + Build.VERSION.RELEASE);
 
-		client.get(Utils.getBaseUrl() + "stats/tag?", params, null);
+		client.get(Utils.getBaseUrl(getActivity()) + "stats/tag?", params, null);
 	}
 
 	private void loadData(String tag, String key, int index, int pageSize) {

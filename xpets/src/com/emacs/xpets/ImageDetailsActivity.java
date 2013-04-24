@@ -134,9 +134,9 @@ public class ImageDetailsActivity extends Activity {
 
 	private void sendImagesStats(int position) {
 		params.put("key", keys[position]);
-		params.put("machine", Utils.getMachineKey());
+		params.put("machine", Utils.getMachineKey(this));
 		params.put("from", "android:" + Build.VERSION.RELEASE);
-		client.get(Utils.getBaseUrl() + "stats/pet?", params,
+		client.get(Utils.getBaseUrl(this) + "stats/pet?", params,
 				new AsyncHttpResponseHandler());
 	}
 

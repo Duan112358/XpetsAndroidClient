@@ -52,21 +52,44 @@ public class Utils {
 		return options;
 	}
 
-	public static String getMachineKey() {
+	public static String getMachineKey(Context context) {
 		String value = System.getProperty(Constants.MACHINE_KEY);
 		if (value == null) {
-			value = UUID.randomUUID().toString();
+			SharedPreferences sp = context.getSharedPreferences(
+					Constants.MACHINE_KEY, Context.MODE_PRIVATE);
+			value = sp.getString(Constants.MACHINE_KEY, null);
+			
+			if (value == null) {
+				value = UUID.randomUUID().toString();
+				Editor editor = sp.edit();
+				editor.putString(Constants.MACHINE_KEY, value);
+				editor.commit();
+			}
+
 			System.setProperty(Constants.MACHINE_KEY, value);
 		}
 		return value;
 	}
 
-	public static String getBaseUrl() {
-		String value = System.getProperty("BASE_URL");
-		if (value == null) {
-			return "http://www.xpets.net/api/";
-		}
+	public static String getBaseUrl(Context context) {
+		String value = null;
+		if ((value = System.getProperty("BASE_URL")) == null) {
+			SharedPreferences sp = context.getSharedPreferences("BASE_URL",
+					Context.MODE_PRIVATE);
+			value = sp.getString("BASE_URL", "http://www.xpets.net/api/");
+			System.setProperty("BASE_URL", value);
+		} 
+		
 		return value;
+	}
+
+	public static void saveBaseUrl(Context context, String value) {
+		SharedPreferences sp = context.getSharedPreferences("BASE_URL",
+				Context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putString("BASE_URL", value);
+		System.setProperty("BASE_URL", value);
+		editor.commit();
 	}
 
 	public static Set<String> getOfflineDataSet(Context context, String key) {
@@ -135,14 +158,14 @@ public class Utils {
 		}
 		return status;
 	}
-	
-	public static Bundle extractPropertiesIntoBundle(List<Pet> pets){
+
+	public static Bundle extractPropertiesIntoBundle(List<Pet> pets) {
 		Bundle bundle = new Bundle();
 		int i = 0;
 		String[] titles = new String[pets.size()];
 		String[] images = new String[pets.size()];
 		String[] keys = new String[pets.size()];
-		for(Pet p : pets){
+		for (Pet p : pets) {
 			titles[i] = p.getTitle();
 			images[i] = p.getPhoto();
 			keys[i] = p.getKey();
