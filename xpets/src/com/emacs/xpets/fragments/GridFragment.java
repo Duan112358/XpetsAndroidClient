@@ -1,12 +1,12 @@
 package com.emacs.xpets.fragments;
 
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.emacs.data.DataManager;
 import com.emacs.http.AsyncHttpClient;
 import com.emacs.http.AsyncHttpResponseHandler;
 import com.emacs.http.JsonHttpResponseHandler;
@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 public abstract class GridFragment<T> extends BaseFragment implements
 		OnRefreshListener2<GridView> {
+	//"http://www.xpets.net/api/ping/GetApiSite?"
 	private static final String REQUEST_URL = "http://www.xpets.net/api/ping/GetApiSite?";
 	private static String BASE_URL = "";
 
@@ -31,8 +32,9 @@ public abstract class GridFragment<T> extends BaseFragment implements
 	protected boolean isRefreshing = false;
 	protected boolean isString = false;
 	private boolean isloading = false;
-	protected LinkedHashSet<String> mKeys = new LinkedHashSet<String>();
+	protected LinkedList<String> mKeys = new LinkedList<String>();
 	protected LinkedList<T> mListItems = new LinkedList<T>();
+	protected DataManager db = new DataManager(this.getActivity());
 
 	protected abstract void onDataLoadingSuccessed();
 

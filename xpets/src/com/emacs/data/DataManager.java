@@ -2,8 +2,6 @@ package com.emacs.data;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Set;
-
 import com.emacs.models.Pet;
 import com.emacs.xpets.utils.MLog;
 
@@ -39,32 +37,35 @@ public class DataManager {
 		}
 	}
 
-	public LinkedList<Pet> getPetsByIDs(Set<String> ids) {
+	public LinkedList<Pet> getPetsByIDs(LinkedList<String> keys) {
 		LinkedList<Pet> pets = new LinkedList<Pet>();
-		
+
 		db = helper.getReadableDatabase();
-		cursor = db.rawQuery("select * from tbl_xpets",new String[]{});
+		cursor = db.rawQuery("select * from tbl_xpets", new String[] {});
 
 		if (!cursor.moveToFirst()) {
 			cursor.close();
 			db.close();
 			helper.close();
-			MLog.i("no record found in ids : " + ids);
+			MLog.i("no record found in ids : " + keys);
 		} else {
 			Pet pet;
 			do {
 				String key = cursor.getString(cursor.getColumnIndex("key"));
-				if(ids.contains(key)){
+				if (keys.contains(key)) {
 					pet = new Pet();
 					pet.setKey(key);
-					pet.setPhoto(cursor.getString(cursor.getColumnIndex("photo")));
-					String temp = cursor.getString(cursor.getColumnIndex("tags"));
+					pet.setPhoto(cursor.getString(cursor
+							.getColumnIndex("photo")));
+					String temp = cursor.getString(cursor
+							.getColumnIndex("tags"));
 					pet.setTags(temp.substring(1, temp.length() - 2).split(","));
 					pet.setThumbnail(cursor.getString(cursor
 							.getColumnIndex("thumbnail")));
-					pet.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+					pet.setTitle(cursor.getString(cursor
+							.getColumnIndex("title")));
 					pets.add(pet);
-					MLog.i("loaded from db pet :" +pet.toString());
+					MLog.i("loaded from db pet :" + pet.toString());
 				}
 			} while (cursor.moveToNext());
 			cursor.close();
@@ -74,6 +75,55 @@ public class DataManager {
 		}
 
 		return pets;
+	}
+
+	public void saveOfflineData(String key, LinkedList<String> value) {
+		db = helper.getWritableDatabase();
+		db.beginTransaction();
+		try {
+			cursor = db.rawQuery(
+					"select value from tbl_xpets_offline_data where key = ?",
+					new String[] { key });
+			if (cursor.moveToFirst()) {
+				db.execSQL(
+						"update tbl_xpets_offline_data set value = ? where key = ?",
+						new String[] { key, value.toString() });
+			} else {
+				db.execSQL("insert into tbl_xpets_offline_data values(?,?)",
+						new String[] { key, value.toString() });
+			}
+		} catch (SQLException e) {
+			MLog.error("Offline data saved falied.");
+			MLog.error(e.getMessage());
+			MLog.error(Arrays.toString(e.getStackTrace()));
+		} finally {
+			cursor.close();
+			db.endTransaction();
+			db.close();
+			helper.close();
+		}
+	}
+
+	public LinkedList<String> getOfflineData(String key) {
+		db = helper.getReadableDatabase();
+		cursor = db.rawQuery(
+				"select value from tbl_xpets_offline_data where key = ?",
+				new String[] { key });
+		LinkedList<String> result = new LinkedList<String>();
+		if (cursor.moveToFirst()) {
+			String temp = cursor.getString(cursor.getColumnIndex("value"));
+			String[] temp_result = temp.substring(1, temp.length() - 2).split(",");
+			
+			for(String s : temp_result){
+				result.add(s);
+			}
+		} else {
+			result = new LinkedList<String>();
+		}
+		cursor.close();
+		db.close();
+		helper.close();
+		return result;
 	}
 
 	public void savePets(LinkedList<Pet> pets) {
@@ -90,7 +140,7 @@ public class DataManager {
 								Arrays.toString(p.getTags()), p.getThumbnail(),
 								p.getTitle() });
 				existsKeys.add(p.getKey());
-				MLog.i("Inserted record : "+p.toString());
+				MLog.i("Inserted record : " + p.toString());
 			}
 			db.setTransactionSuccessful();
 			MLog.i("record inserting completed.");

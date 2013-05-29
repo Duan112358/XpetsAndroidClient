@@ -1,8 +1,6 @@
 package com.emacs.xpets.fragments;
 
-import java.util.Set;
-
-import com.emacs.data.DataManager;
+import java.util.LinkedList;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -33,11 +31,9 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
 		
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
-					Constants.GET_RECOMMEND);
+			LinkedList<String> keys =db.getOfflineData("recommend");
 			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(new DataManager(getActivity())
-						.getPetsByIDs(keys));
+				mListItems.addAll(db.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
 		} else {
@@ -109,9 +105,10 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 		if (mKeys.size() == 0) {
 			return;
 		}
-		Utils.saveStringSet(getActivity(), Constants.GET_RECOMMEND,
-				mKeys);
-		new DataManager(getActivity()).savePets(mListItems);
+		
+		db.saveOfflineData("recommend", mKeys);
+		//Utils.saveStringSet(getActivity(), Constants.GET_RECOMMEND, mKeys);
+		db.savePets(mListItems);
 	}
 
 }

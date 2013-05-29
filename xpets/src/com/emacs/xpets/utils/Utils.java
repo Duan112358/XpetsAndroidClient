@@ -16,10 +16,8 @@
 
 package com.emacs.xpets.utils;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +90,7 @@ public class Utils {
 		editor.commit();
 	}
 
-	public static Set<String> getOfflineDataSet(Context context, String key) {
+	/*public static Set<String> getOfflineDataSet(Context context, String key) {
 		SharedPreferences sp = context.getSharedPreferences(
 				Constants.OFFLINE_DATA, Context.MODE_PRIVATE);
 		if (sp.contains(key)) {
@@ -111,7 +109,7 @@ public class Utils {
 		}
 		editor.putStringSet(key, tags);
 		editor.commit();
-	}
+	}*/
 
 	public static LinkedList<String> parseJsonArrayToStringSet(JSONArray array) {
 		LinkedList<String> values = new LinkedList<String>();

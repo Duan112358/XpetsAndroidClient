@@ -1,6 +1,7 @@
 package com.emacs.xpets;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import com.emacs.http.AsyncHttpClient;
@@ -25,7 +26,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -96,40 +96,62 @@ public class ImageDetailsActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_share:
-			processBitmap();
+			share();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	void processBitmap() {
-		try {
-			File save_dir = Environment.getExternalStorageDirectory();
+	void share() {
 
-			File imageFile = new File(save_dir + "/share.jpg");
-			if (imageFile.exists()) {
-				imageFile.delete();
-			}
+		loader.loadImage(images[mAdapter.getCurrent()],
+				new SimpleImageLoadingListener() {
+					@Override
+					public void onLoadingComplete(String imageUri, View view,
+							Bitmap loadedImage) {
 
-			FileOutputStream out = new FileOutputStream(imageFile, false);
+						final File save_dir = Environment
+								.getExternalStorageDirectory();
 
-			Bitmap map = BitmapFactory.decodeFile(loader.getDiscCache()
-					.get(images[mAdapter.getCurrent()]).getAbsolutePath());
-			map.compress(Bitmap.CompressFormat.JPEG, 100, out);
+						File imageFile = new File(save_dir + "/share.jpg");
+						if (imageFile.exists()) {
+							imageFile.delete();
+						}
 
-			Intent share = new Intent(Intent.ACTION_SEND);
-			share.setType("image/*");
+						try {
+							FileOutputStream out = new FileOutputStream(
+									imageFile, false);
+							loadedImage.compress(Bitmap.CompressFormat.JPEG,
+									100, out);
 
-			share.putExtra(Intent.EXTRA_STREAM,
-					Uri.parse("file:///" + save_dir + "/share.jpg"));
+							Intent share = new Intent(Intent.ACTION_SEND);
+							share.setType("image/*");
 
-			startActivity(Intent.createChooser(share, "Share Image"));
+							share.putExtra(
+									Intent.EXTRA_STREAM,
+									Uri.parse("file:///" + save_dir
+											+ "/share.jpg"));
+							share.putExtra(Intent.EXTRA_TEXT,
+									titles[mAdapter.getCurrent()]);
 
-		} catch (Exception e) {
-			Toast.makeText(this, R.string.share_error, Toast.LENGTH_LONG)
-					.show();
-		}
+							startActivity(Intent.createChooser(share,
+									"Share Image"));
+						} catch (FileNotFoundException e) {
+							Toast.makeText(ImageDetailsActivity.this,
+									R.string.share_error, Toast.LENGTH_LONG)
+									.show();
+						}
+
+					}
+
+					@Override
+					public void onLoadingFailed(String imageUri, View view,
+							FailReason failReason) {
+						Toast.makeText(ImageDetailsActivity.this,
+								R.string.share_error, Toast.LENGTH_LONG).show();
+					}
+				});
 	}
 
 	private void sendImagesStats(int position) {

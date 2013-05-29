@@ -1,7 +1,6 @@
 package com.emacs.xpets.fragments;
 
-import java.util.Set;
-
+import java.util.LinkedList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -13,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
-import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -64,11 +62,9 @@ public class GridLatestFragment extends GridFragment<Pet> {
 
 	private void init() {
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			Set<String> keys = Utils.getOfflineDataSet(getActivity(),
-					Constants.GET_LATEST);
+			LinkedList<String> keys = db.getOfflineData("latest");
 			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(new DataManager(getActivity())
-						.getPetsByIDs(keys));
+				mListItems.addAll(db.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
 		} else {
@@ -128,7 +124,7 @@ public class GridLatestFragment extends GridFragment<Pet> {
 		if (mKeys.size() == 0) {
 			return;
 		}
-		Utils.saveStringSet(getActivity(), Constants.GET_LATEST, mKeys);
-		new DataManager(getActivity()).savePets(mListItems);
+		db.saveOfflineData("latest", mKeys);
+		db.savePets(mListItems);
 	}
 }

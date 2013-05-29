@@ -63,5 +63,5 @@ public class MainActivity extends FragmentActivity implements
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 
 	}
-	
+
 }

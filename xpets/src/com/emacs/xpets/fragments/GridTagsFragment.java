@@ -4,7 +4,6 @@ import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
 import com.emacs.pulltorefresh.PullToRefreshGridView;
 import com.emacs.xpets.TagDetailsActivity;
-import com.emacs.xpets.utils.Constants;
 import com.emacs.xpets.utils.DataType;
 import com.emacs.xpets.utils.MLog;
 import com.emacs.xpets.utils.Utils;
@@ -32,8 +31,7 @@ public class GridTagsFragment extends GridFragment<String> {
 		isString = true;
 
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			mListItems.addAll(Utils.getOfflineDataSet(getActivity(),
-					Constants.GET_TAGS));
+			mListItems.addAll(db.getOfflineData("tags"));
 			mAdapter.notifyDataSetChanged();
 		} else {
 			loadData(DataType.AllTags);
@@ -98,8 +96,9 @@ public class GridTagsFragment extends GridFragment<String> {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (mKeys.size() > 0) {
-			Utils.saveStringSet(getActivity(), Constants.GET_TAGS, mKeys);
+		if (mListItems.size() > 0) {
+			db.saveOfflineData("tags", mListItems);
+			//Utils.saveStringSet(getActivity(), Constants.GET_TAGS, mKeys);
 		}
 	}
 }
