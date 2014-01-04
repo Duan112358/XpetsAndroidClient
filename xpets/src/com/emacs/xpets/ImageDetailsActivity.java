@@ -4,6 +4,29 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.emacs.http.AsyncHttpClient;
 import com.emacs.http.AsyncHttpResponseHandler;
 import com.emacs.http.RequestParams;
@@ -13,29 +36,10 @@ import com.emacs.xpets.utils.Utils;
 import com.generpoint.xpets.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.graphics.Bitmap;
-import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class ImageDetailsActivity extends Activity {
 	private ViewPager mViewPager;
@@ -49,16 +53,22 @@ public class ImageDetailsActivity extends Activity {
 	private String[] keys;
 	private String[] images;
 	private int current;
+	private int previousTab;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
 		setContentView(R.layout.image_viewer);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		Bundle bundle = getIntent().getExtras();
 		images = bundle.getStringArray("images");
 		keys = bundle.getStringArray("keys");
 		titles = bundle.getStringArray("titles");
+		previousTab = bundle.getInt("tab");
 
 		if (savedInstanceState != null) {
 			current = savedInstanceState.getInt("current");
@@ -77,7 +87,7 @@ public class ImageDetailsActivity extends Activity {
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
 		mViewPager = (ViewPager) findViewById(R.id.imageviewer);
-		// mViewPager.setOffscreenPageLimit(3);
+		
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setCurrentItem(current);
 	}
@@ -87,9 +97,18 @@ public class ImageDetailsActivity extends Activity {
 		outState.putInt("current", mViewPager.getCurrentItem());
 	}
 
+	public void toggleActionBar(View view) {
+		ActionBar actionBar = getActionBar();
+		if (actionBar.isShowing()) {
+			getActionBar().hide();
+		} else {
+			actionBar.show();
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.details_menu, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -98,12 +117,28 @@ public class ImageDetailsActivity extends Activity {
 		case R.id.menu_share:
 			share();
 			return true;
+		case android.R.id.home:
+			navigateBackUp();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	private void navigateBackUp(){
+		Intent upIntent = NavUtils.getParentActivityIntent(this);
+		upIntent.putExtra("tab", previousTab);
+		//This activity is NOT part of this app's task, so create
+		// a new task when navigating up, with a synthesized back stack.
+		if(NavUtils.shouldUpRecreateTask(this, upIntent)){
+			//Add all of this activity's parents to the back stack and navigate to the closest parent
+			TaskStackBuilder.create(this).addNextIntentWithParentStack(upIntent).startActivities();
+		}else{//This activity is part of this app's task, so simply navigate up to the logical parent
+			NavUtils.navigateUpTo(this, upIntent);
+		}
+	}
 
-	void share() {
+	private void share() {
 
 		loader.loadImage(images[mAdapter.getCurrent()],
 				new SimpleImageLoadingListener() {

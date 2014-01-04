@@ -26,7 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ "thumbnail varchar(300) not null,"
 				+ "title varvhar(500) not null);");
 		db.execSQL("create table if not exists tbl_xpets_offline_data(key varchar(100) primary key," +
-				"value varchar(2000);)");
+				"value varchar(2000));");
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ "thumbnail varchar(300) not null,"
 				+ "title varvhar(500) not null);");
 		db.execSQL("create table if not exists tbl_xpets_offline_data(key varchar(100) primary key," +
-				"value varchar(2000);)");
+				"value varchar(2000));");
 	}
 
 }

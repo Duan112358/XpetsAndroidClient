@@ -1,31 +1,54 @@
 package com.emacs.data;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
-import com.emacs.models.Pet;
-import com.emacs.xpets.utils.MLog;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.app.Fragment;
 
-public class DataManager {
-	private DBHelper helper;
-	private SQLiteDatabase db;
-	private Cursor cursor;
+import com.emacs.models.Pet;
+import com.emacs.xpets.utils.MLog;
 
-	public DataManager(Context context) {
-		helper = new DBHelper(context);
+@SuppressLint("UseSparseArrays")
+public final class DataManager {
+	private static DBHelper helper;
+	private static SQLiteDatabase db;
+	private static Cursor cursor;
+	private static HashMap<Integer, Fragment> fragmentCache = new HashMap<Integer, Fragment>(3);
+	private static boolean isInitialized = false;
+
+	private DataManager() {
+
 	}
 
-	public void clearDB() {
+	public static synchronized void dispose() {
+		helper.close();
+		helper = null;
+		isInitialized = false;
+	}
+
+	public static synchronized void initialize(Context context) {
+		if (isInitialized) {
+			MLog.i("DataManager already initialized!");
+			return;
+		}
+
+		helper = new DBHelper(context);
+		isInitialized = true;
+		MLog.i("DataManager initialized successfully!");
+	}
+
+	public static synchronized void clearDB() {
 		db = helper.getWritableDatabase();
 		db.beginTransaction();
 		try {
 			db.execSQL("delete from tbl_xpets");
 			db.setTransactionSuccessful();
-			MLog.i("tbl_xpets cleared successfully.");
 		} catch (SQLException e) {
 			MLog.error("clear database failed.");
 			MLog.error(e.getMessage());
@@ -37,7 +60,8 @@ public class DataManager {
 		}
 	}
 
-	public LinkedList<Pet> getPetsByIDs(LinkedList<String> keys) {
+	public static synchronized LinkedList<Pet> getPetsByIDs(
+			LinkedList<String> keys) {
 		LinkedList<Pet> pets = new LinkedList<Pet>();
 
 		db = helper.getReadableDatabase();
@@ -46,8 +70,6 @@ public class DataManager {
 		if (!cursor.moveToFirst()) {
 			cursor.close();
 			db.close();
-			helper.close();
-			MLog.i("no record found in ids : " + keys);
 		} else {
 			Pet pet;
 			do {
@@ -65,19 +87,20 @@ public class DataManager {
 					pet.setTitle(cursor.getString(cursor
 							.getColumnIndex("title")));
 					pets.add(pet);
-					MLog.i("loaded from db pet :" + pet.toString());
 				}
 			} while (cursor.moveToNext());
 			cursor.close();
 			db.close();
-			helper.close();
-			MLog.i("record querying completed.");
 		}
+
+		helper.close();
 
 		return pets;
 	}
 
-	public void saveOfflineData(String key, LinkedList<String> value) {
+	public static synchronized void saveOfflineData(String key,
+			LinkedList<String> value) {
+
 		db = helper.getWritableDatabase();
 		db.beginTransaction();
 		try {
@@ -92,6 +115,7 @@ public class DataManager {
 				db.execSQL("insert into tbl_xpets_offline_data values(?,?)",
 						new String[] { key, value.toString() });
 			}
+			db.setTransactionSuccessful();
 		} catch (SQLException e) {
 			MLog.error("Offline data saved falied.");
 			MLog.error(e.getMessage());
@@ -104,17 +128,19 @@ public class DataManager {
 		}
 	}
 
-	public LinkedList<String> getOfflineData(String key) {
+	public static synchronized LinkedList<String> getOfflineData(String key) {
+		LinkedList<String> result = new LinkedList<String>();
+
 		db = helper.getReadableDatabase();
 		cursor = db.rawQuery(
 				"select value from tbl_xpets_offline_data where key = ?",
 				new String[] { key });
-		LinkedList<String> result = new LinkedList<String>();
 		if (cursor.moveToFirst()) {
 			String temp = cursor.getString(cursor.getColumnIndex("value"));
-			String[] temp_result = temp.substring(1, temp.length() - 2).split(",");
-			
-			for(String s : temp_result){
+			String[] temp_result = temp.substring(1, temp.length() - 2).split(
+					",");
+
+			for (String s : temp_result) {
 				result.add(s);
 			}
 		} else {
@@ -123,12 +149,19 @@ public class DataManager {
 		cursor.close();
 		db.close();
 		helper.close();
+
 		return result;
 	}
 
-	public void savePets(LinkedList<Pet> pets) {
+	public static synchronized void savePets(LinkedList<Pet> pets) {
+
+		if (pets == null || pets.size() == 0) {
+			return;
+		}
+
 		db = helper.getWritableDatabase();
 		db.beginTransaction();
+
 		try {
 			LinkedList<String> existsKeys = getAllKeys(db);
 			for (Pet p : pets) {
@@ -140,10 +173,8 @@ public class DataManager {
 								Arrays.toString(p.getTags()), p.getThumbnail(),
 								p.getTitle() });
 				existsKeys.add(p.getKey());
-				MLog.i("Inserted record : " + p.toString());
 			}
 			db.setTransactionSuccessful();
-			MLog.i("record inserting completed.");
 		} catch (SQLException e) {
 			MLog.error("Record data into database falied.");
 			MLog.error(e.getMessage());
@@ -155,7 +186,7 @@ public class DataManager {
 		}
 	}
 
-	public boolean isExist(String key) {
+	public static synchronized boolean isExist(String key) {
 		db = helper.getReadableDatabase();
 		cursor = db.rawQuery("select count(*) from tbl_xpets where key = ?",
 				new String[] { key });
@@ -163,11 +194,17 @@ public class DataManager {
 		cursor.close();
 		db.close();
 		helper.close();
+
 		return result;
 	}
 
-	private LinkedList<String> getAllKeys(SQLiteDatabase db) {
+	private static synchronized LinkedList<String> getAllKeys(SQLiteDatabase db) {
 		LinkedList<String> keys = new LinkedList<String>();
+
+		if(!db.isOpen()){
+			db = helper.getWritableDatabase();
+		}
+		
 		cursor = db.rawQuery("select distinct key from tbl_xpets",
 				new String[] {});
 
@@ -178,7 +215,21 @@ public class DataManager {
 		}
 
 		cursor.close();
-		MLog.i(Arrays.toString(keys.toArray()));
+
 		return keys;
+	}
+	
+	public static synchronized void cacheFragment(int tag, Fragment fragment){
+		if(!fragmentCache.containsKey(tag)){
+			fragmentCache.put(tag, fragment);
+		}
+	}
+	
+	public static synchronized boolean isFragmentCached(int key){
+		return fragmentCache.containsKey(key);
+	}
+	
+	public static synchronized Fragment getFragment(int key){
+		return fragmentCache.get(key);
 	}
 }

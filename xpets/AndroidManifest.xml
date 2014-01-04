@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -29,12 +29,19 @@
         </activity>
         <activity
             android:name="com.emacs.xpets.ImageDetailsActivity"
-            android:theme="@style/AppTheme.FullScreen"
-            android:configChanges="orientation" >
+            android:configChanges="orientation"
+            android:parentActivityName="com.emacs.xpets.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.emacs.xpets.MainActivity" />
         </activity>
         <activity
             android:name="com.emacs.xpets.TagDetailsActivity"
+            android:parentActivityName="com.emacs.xpets.MainActivity"
             android:theme="@style/PhotoGridLayout" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.emacs.xpets.MainActivity" />
         </activity>
     </application>
 

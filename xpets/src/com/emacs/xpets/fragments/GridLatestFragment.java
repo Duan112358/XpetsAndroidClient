@@ -1,10 +1,10 @@
 package com.emacs.xpets.fragments;
 
 import java.util.LinkedList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -51,6 +52,7 @@ public class GridLatestFragment extends GridFragment<Pet> {
 				Intent intent = new Intent(getActivity(),
 						ImageDetailsActivity.class);
 				Bundle bundle = Utils.extractPropertiesIntoBundle(mListItems);
+				bundle.putInt("tab", Constants.LATEST);
 				bundle.putInt("current", position);
 				intent.putExtras(bundle);
 				startActivity(intent);
@@ -62,9 +64,9 @@ public class GridLatestFragment extends GridFragment<Pet> {
 
 	private void init() {
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			LinkedList<String> keys = db.getOfflineData("latest");
+			LinkedList<String> keys = DataManager.getOfflineData("latest");
 			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(db.getPetsByIDs(keys));
+				mListItems.addAll(DataManager.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
 		} else {
@@ -73,7 +75,6 @@ public class GridLatestFragment extends GridFragment<Pet> {
 	}
 
 	private void loadData(String key, int pageSize, int direction) {
-		Log.i(Constants.TAG, "Loading latest images begining...");
 		addRequestParameter("key", key);
 		addRequestParameter("d", direction + "");
 		addRequestParameter("n", pageSize + "");
@@ -120,11 +121,10 @@ public class GridLatestFragment extends GridFragment<Pet> {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		if (mKeys.size() == 0) {
-			return;
+		if (mKeys.size() > 0) {
+			DataManager.saveOfflineData("latest", mKeys);
+			DataManager.savePets(mListItems);
 		}
-		db.saveOfflineData("latest", mKeys);
-		db.savePets(mListItems);
+		super.onDestroy();
 	}
 }

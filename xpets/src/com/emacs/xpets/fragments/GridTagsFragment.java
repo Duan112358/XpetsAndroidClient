@@ -1,14 +1,5 @@
 package com.emacs.xpets.fragments;
 
-import com.emacs.pulltorefresh.PullToRefreshBase;
-import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
-import com.emacs.pulltorefresh.PullToRefreshGridView;
-import com.emacs.xpets.TagDetailsActivity;
-import com.emacs.xpets.utils.DataType;
-import com.emacs.xpets.utils.MLog;
-import com.emacs.xpets.utils.Utils;
-import com.generpoint.xpets.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -19,6 +10,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+
+import com.emacs.data.DataManager;
+import com.emacs.pulltorefresh.PullToRefreshBase;
+import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
+import com.emacs.pulltorefresh.PullToRefreshGridView;
+import com.emacs.xpets.TagDetailsActivity;
+import com.emacs.xpets.utils.Constants;
+import com.emacs.xpets.utils.DataType;
+import com.emacs.xpets.utils.Utils;
+import com.generpoint.xpets.R;
 
 public class GridTagsFragment extends GridFragment<String> {
 	private ArrayAdapter<String> mAdapter;
@@ -31,7 +32,7 @@ public class GridTagsFragment extends GridFragment<String> {
 		isString = true;
 
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			mListItems.addAll(db.getOfflineData("tags"));
+			mListItems.addAll(DataManager.getOfflineData("tags"));
 			mAdapter.notifyDataSetChanged();
 		} else {
 			loadData(DataType.AllTags);
@@ -57,6 +58,7 @@ public class GridTagsFragment extends GridFragment<String> {
 				String currentTag = mListItems.get(position);
 				Intent intent = new Intent(inflater.getContext(),
 						TagDetailsActivity.class);
+				intent.putExtra("tab", Constants.TAGS);
 				intent.putExtra("tag", currentTag);
 				startActivity(intent);
 			}
@@ -67,7 +69,6 @@ public class GridTagsFragment extends GridFragment<String> {
 
 	@Override
 	protected void onDataLoadingSuccessed() {
-		MLog.i("Tags refreshed completed!");
 		mAdapter.notifyDataSetChanged();
 	}
 
@@ -95,10 +96,10 @@ public class GridTagsFragment extends GridFragment<String> {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		if (mListItems.size() > 0) {
-			db.saveOfflineData("tags", mListItems);
-			//Utils.saveStringSet(getActivity(), Constants.GET_TAGS, mKeys);
+			DataManager.saveOfflineData("tags", mListItems);
 		}
+		
+		super.onDestroy();
 	}
 }

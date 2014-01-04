@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
@@ -47,6 +48,17 @@ public class MainActivity extends FragmentActivity implements
 				.setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText(R.string.tags)
 				.setTabListener(this));
+
+		if (savedInstanceState != null) {
+			int previousTab = savedInstanceState.getInt("tab", 0);
+			mViewPager.setCurrentItem(previousTab);
+		} else {
+			Intent previousIntent = getIntent();
+			if (previousIntent != null) {
+				mViewPager.setCurrentItem(previousIntent.getIntExtra(
+						"tab", 0));
+			}
+		}
 	}
 
 	@Override

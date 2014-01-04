@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.emacs.data.DataManager;
 import com.emacs.http.AsyncHttpClient;
 import com.emacs.http.AsyncHttpResponseHandler;
 import com.emacs.http.JsonHttpResponseHandler;
@@ -34,7 +33,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 	private boolean isloading = false;
 	protected LinkedList<String> mKeys = new LinkedList<String>();
 	protected LinkedList<T> mListItems = new LinkedList<T>();
-	protected DataManager db = new DataManager(this.getActivity());
 
 	protected abstract void onDataLoadingSuccessed();
 
@@ -82,7 +80,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 					mListItems.add((T) tag);
 					mKeys.add(tag);
 				}
-				MLog.i("Tags refreshing completed.");
 			} else {
 				Pet pet;
 				for (int i = 0; i < content.length(); i++) {
@@ -108,7 +105,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 						mListItems.add((T) pet);
 					}
 				}
-				MLog.i("Pets loaded completed. count : " + content.length());
 			}
 		} catch (JSONException e) {
 			MLog.error(e.getMessage());
@@ -133,7 +129,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 				
 				BASE_URL = baseUrl;
 				
-				MLog.i(baseUrl);
 				String original = Utils.getBaseUrl(getActivity());
 				
 				if (original == null || !original.equalsIgnoreCase(baseUrl)) {
@@ -178,7 +173,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 						isloading = false;
 					}
 				});
-		MLog.i(AsyncHttpClient.getUrlWithQueryString(url.getUrl(), params));
 	}
 
 }

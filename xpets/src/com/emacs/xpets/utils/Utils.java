@@ -90,27 +90,6 @@ public class Utils {
 		editor.commit();
 	}
 
-	/*public static Set<String> getOfflineDataSet(Context context, String key) {
-		SharedPreferences sp = context.getSharedPreferences(
-				Constants.OFFLINE_DATA, Context.MODE_PRIVATE);
-		if (sp.contains(key)) {
-			return sp.getStringSet(key, new HashSet<String>());
-		}
-		return new HashSet<String>();
-	}
-
-	public static void saveStringSet(Context context, String key,
-			Set<String> tags) {
-		SharedPreferences sp = context.getSharedPreferences(
-				Constants.OFFLINE_DATA, Context.MODE_PRIVATE);
-		Editor editor = sp.edit();
-		if (sp.contains(key)) {
-			editor.remove(key);
-		}
-		editor.putStringSet(key, tags);
-		editor.commit();
-	}*/
-
 	public static LinkedList<String> parseJsonArrayToStringSet(JSONArray array) {
 		LinkedList<String> values = new LinkedList<String>();
 		for (int i = 0; i < array.length(); i++) {

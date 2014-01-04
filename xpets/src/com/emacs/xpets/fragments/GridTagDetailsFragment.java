@@ -1,6 +1,8 @@
 package com.emacs.xpets.fragments;
 
 import java.util.LinkedList;
+
+import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -33,12 +35,11 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
 		currentTag = getArguments().getString("tag");
-		MLog.i(currentTag);
 
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			LinkedList<String> keys = db.getOfflineData(currentTag);
+			LinkedList<String> keys = DataManager.getOfflineData(currentTag);
 			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(db.getPetsByIDs(keys));
+				mListItems.addAll(DataManager.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
 		} else {
@@ -119,13 +120,12 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-
-		if (mKeys.size() == 0) {
-			return;
+		if (mKeys.size() > 0) {
+			DataManager.saveOfflineData(currentTag, mKeys);
+			DataManager.savePets(mListItems);
 		}
-		db.saveOfflineData(currentTag, mKeys);
-		db.savePets(mListItems);
+		
+		super.onDestroy();
 	}
 
 }

@@ -2,6 +2,8 @@ package com.emacs.xpets.utils;
 
 import android.app.Application;
 import android.content.Context;
+
+import com.emacs.data.DataManager;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -19,6 +21,7 @@ public class UILApplication extends Application {
 		 */
 		super.onCreate();
 		initImageLoader(getApplicationContext());
+		DataManager.initialize(this);
 	}
 
 	public static void initImageLoader(Context context) {
@@ -31,9 +34,15 @@ public class UILApplication extends Application {
 				context).threadPriority(Thread.NORM_PRIORITY - 2)
 				.denyCacheImageMultipleSizesInMemory()
 				.discCacheFileNameGenerator(new Md5FileNameGenerator())
-				.tasksProcessingOrder(QueueProcessingType.LIFO).enableLogging() // Not
+				.tasksProcessingOrder(QueueProcessingType.LIFO)
 				.build();
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);
+	}
+	
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+		DataManager.dispose();
 	}
 }

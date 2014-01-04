@@ -1,6 +1,8 @@
 package com.emacs.xpets.fragments;
 
 import java.util.LinkedList;
+
+import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
 import com.emacs.pulltorefresh.PullToRefreshBase.Mode;
@@ -29,11 +31,11 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new GridImageAdapter(getActivity(), mListItems);
-		
+
 		if (!Utils.isNetworkAvailable(getActivity())) {
-			LinkedList<String> keys =db.getOfflineData("recommend");
+			LinkedList<String> keys = DataManager.getOfflineData("recommend");
 			if (keys != null && keys.size() > 0) {
-				mListItems.addAll(db.getPetsByIDs(keys));
+				mListItems.addAll(DataManager.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
 		} else {
@@ -58,6 +60,7 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 						ImageDetailsActivity.class);
 				Bundle bundle = Utils.extractPropertiesIntoBundle(mListItems);
 				bundle.putInt("current", position);
+				bundle.putInt("tab", Constants.RECOMMEND);
 				intent.putExtras(bundle);
 				startActivity(intent);
 			}
@@ -66,7 +69,6 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 		ptrGridView.setOnRefreshListener(this);
 		ptrGridView.setAdapter(mAdapter);
 
-		
 		return rootView;
 	}
 
@@ -101,14 +103,12 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		if (mKeys.size() == 0) {
-			return;
+		if (mKeys.size() > 0) {
+			DataManager.saveOfflineData("recommend", mKeys);
+			DataManager.savePets(mListItems);
 		}
-		
-		db.saveOfflineData("recommend", mKeys);
-		//Utils.saveStringSet(getActivity(), Constants.GET_RECOMMEND, mKeys);
-		db.savePets(mListItems);
+		super.onDestroy();
+
 	}
 
 }

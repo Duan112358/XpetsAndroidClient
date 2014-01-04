@@ -1,5 +1,6 @@
 package com.emacs.xpets.fragments;
 
+import com.emacs.data.DataManager;
 import com.emacs.pulltorefresh.PullToRefreshGridView;
 import com.generpoint.xpets.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -18,6 +19,7 @@ public class BaseFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setHasOptionsMenu(true);
 	}
 
@@ -45,9 +47,16 @@ public class BaseFragment extends Fragment {
 			return true;
 		case R.id.item_clear_disc_cache:
 			mImageLoader.clearDiscCache();
+			DataManager.clearDB();
 			return true;
 		default:
 			return false;
 		}
 	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
 }
