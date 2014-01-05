@@ -9,7 +9,9 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.view.MenuItem;
 
+import com.emacs.data.DataManager;
 import com.emacs.xpets.fragments.GridTagDetailsFragment;
+import com.emacs.xpets.utils.Constants;
 
 public class TagDetailsActivity extends FragmentActivity {
 	private static final String TAG = "TagDetails";
@@ -29,7 +31,13 @@ public class TagDetailsActivity extends FragmentActivity {
 		if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
 			final FragmentTransaction ft = getSupportFragmentManager()
 					.beginTransaction();
-			Fragment f = new GridTagDetailsFragment();
+			Fragment f ;
+			if(DataManager.isFragmentCached(Constants.By_TAG)){
+				f = DataManager.getFragment(Constants.By_TAG);
+			}else{
+				f = new GridTagDetailsFragment();
+				DataManager.cacheFragment(Constants.By_TAG, f);
+			}
 			Bundle bundle = new Bundle();
 			bundle.putString("tag", tag);
 			f.setArguments(bundle);
