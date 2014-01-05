@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -21,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,6 +41,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+@SuppressLint("InlinedApi")
 public class ImageDetailsActivity extends Activity {
 	private ViewPager mViewPager;
 	private DisplayImageOptions option;
@@ -58,8 +59,6 @@ public class ImageDetailsActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
 		setContentView(R.layout.image_viewer);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -100,8 +99,11 @@ public class ImageDetailsActivity extends Activity {
 	public void toggleActionBar(View view) {
 		ActionBar actionBar = getActionBar();
 		if (actionBar.isShowing()) {
-			getActionBar().hide();
+			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+		            | View.SYSTEM_UI_FLAG_FULLSCREEN);// hide status bar
+			actionBar.hide();
 		} else {
+			getWindow().getDecorView().setSystemUiVisibility(0);
 			actionBar.show();
 		}
 	}
