@@ -48,6 +48,7 @@ public class BaseFragment extends Fragment {
 		case R.id.item_clear_disc_cache:
 			mImageLoader.clearDiscCache();
 			DataManager.clearDB();
+			
 			return true;
 		default:
 			return false;

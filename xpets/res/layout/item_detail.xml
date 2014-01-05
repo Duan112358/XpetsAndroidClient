@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:onClick="toggleActionBar"
     android:padding="1dip" >
 
     <ImageView
@@ -10,8 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
-        android:onClick="toggleActionBar" />
+        android:contentDescription="@string/app_name" />
 
     <ProgressBar
         android:id="@+id/loading"
@@ -20,14 +20,15 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone" />
-    
-    <TextView android:id="@+id/title"
+
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dip"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dip"
         android:textAlignment="center"
-        android:textIsSelectable="false"/>
+        android:textIsSelectable="false" />
 
 </RelativeLayout>

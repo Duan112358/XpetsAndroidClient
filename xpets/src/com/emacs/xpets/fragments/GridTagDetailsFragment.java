@@ -2,6 +2,16 @@ package com.emacs.xpets.fragments;
 
 import java.util.LinkedList;
 
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
+
 import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
@@ -11,22 +21,11 @@ import com.emacs.xpets.ImageDetailsActivity;
 import com.emacs.xpets.adapters.GridImageAdapter;
 import com.emacs.xpets.utils.Constants;
 import com.emacs.xpets.utils.DataType;
-import com.emacs.xpets.utils.MLog;
 import com.emacs.xpets.utils.Utils;
 import com.generpoint.xpets.R;
 
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.AdapterView.OnItemClickListener;
-
 public class GridTagDetailsFragment extends GridFragment<Pet> {
-	private static String currentTag;
+	private String currentTag;
 	private GridImageAdapter mAdapter;
 
 	@Override
@@ -39,6 +38,7 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 		if (!Utils.isNetworkAvailable(getActivity())) {
 			LinkedList<String> keys = DataManager.getOfflineData(currentTag);
 			if (keys != null && keys.size() > 0) {
+				mListItems.clear();
 				mListItems.addAll(DataManager.getPetsByIDs(keys));
 				mAdapter.notifyDataSetChanged();
 			}
@@ -84,8 +84,6 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 	}
 
 	private void loadData(String tag, String key, int index, int pageSize) {
-		MLog.i("Loading recommend images begining...");
-
 		addRequestParameter("tag", tag);
 		addRequestParameter("key", key);
 		addRequestParameter("d", index + "");
@@ -96,7 +94,6 @@ public class GridTagDetailsFragment extends GridFragment<Pet> {
 
 	@Override
 	protected void onDataLoadingSuccessed() {
-		MLog.i("Loading recommend completed.");
 		sendTagsStats();
 		mAdapter.notifyDataSetChanged();
 	}

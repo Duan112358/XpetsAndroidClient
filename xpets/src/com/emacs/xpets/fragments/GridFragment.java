@@ -155,8 +155,6 @@ public abstract class GridFragment<T> extends BaseFragment implements
 					@Override
 					public void onSuccess(JSONArray response) {
 						praseJsonData(response);
-						MLog.i("Data loading completed. Retrieve data size : "
-								+ response.length());
 					}
 
 					@Override

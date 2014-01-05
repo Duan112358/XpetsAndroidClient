@@ -32,6 +32,7 @@ public class GridTagsFragment extends GridFragment<String> {
 		isString = true;
 
 		if (!Utils.isNetworkAvailable(getActivity())) {
+			mListItems.clear();
 			mListItems.addAll(DataManager.getOfflineData("tags"));
 			mAdapter.notifyDataSetChanged();
 		} else {

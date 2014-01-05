@@ -48,6 +48,8 @@ public final class DataManager {
 		db.beginTransaction();
 		try {
 			db.execSQL("delete from tbl_xpets");
+			db.execSQL("delete from tbl_xpets_offline_data");
+			fragmentCache.clear();
 			db.setTransactionSuccessful();
 		} catch (SQLException e) {
 			MLog.error("clear database failed.");

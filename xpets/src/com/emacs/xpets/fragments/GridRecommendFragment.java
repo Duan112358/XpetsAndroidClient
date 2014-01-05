@@ -2,6 +2,15 @@ package com.emacs.xpets.fragments;
 
 import java.util.LinkedList;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
+
 import com.emacs.data.DataManager;
 import com.emacs.models.Pet;
 import com.emacs.pulltorefresh.PullToRefreshBase;
@@ -11,18 +20,8 @@ import com.emacs.xpets.ImageDetailsActivity;
 import com.emacs.xpets.adapters.GridImageAdapter;
 import com.emacs.xpets.utils.Constants;
 import com.emacs.xpets.utils.DataType;
-import com.emacs.xpets.utils.MLog;
 import com.emacs.xpets.utils.Utils;
 import com.generpoint.xpets.R;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class GridRecommendFragment extends GridFragment<Pet> {
 	private GridImageAdapter mAdapter;
@@ -73,7 +72,6 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 	}
 
 	private void loadData(int index, int pageSize) {
-		MLog.i("Loading recommend images begining...");
 		addRequestParameter("i", index + "");
 		addRequestParameter("n", pageSize + "");
 
@@ -82,7 +80,6 @@ public class GridRecommendFragment extends GridFragment<Pet> {
 
 	@Override
 	protected void onDataLoadingSuccessed() {
-		MLog.i("Loading recommend completed.");
 		mAdapter.notifyDataSetChanged();
 	}
 

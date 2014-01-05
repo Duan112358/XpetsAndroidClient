@@ -59,7 +59,7 @@ public class ImageDetailsActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        
+
 		setContentView(R.layout.image_viewer);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -86,7 +86,7 @@ public class ImageDetailsActivity extends Activity {
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
 		mViewPager = (ViewPager) findViewById(R.id.imageviewer);
-		
+
 		mViewPager.setAdapter(mAdapter);
 		mViewPager.setCurrentItem(current);
 	}
@@ -99,8 +99,9 @@ public class ImageDetailsActivity extends Activity {
 	public void toggleActionBar(View view) {
 		ActionBar actionBar = getActionBar();
 		if (actionBar.isShowing()) {
-			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-		            | View.SYSTEM_UI_FLAG_FULLSCREEN);// hide status bar
+			getWindow().getDecorView().setSystemUiVisibility(
+					View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+							| View.SYSTEM_UI_FLAG_FULLSCREEN);// hide status bar
 			actionBar.hide();
 		} else {
 			getWindow().getDecorView().setSystemUiVisibility(0);
@@ -126,16 +127,19 @@ public class ImageDetailsActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
-	private void navigateBackUp(){
+
+	private void navigateBackUp() {
 		Intent upIntent = NavUtils.getParentActivityIntent(this);
 		upIntent.putExtra("tab", previousTab);
-		//This activity is NOT part of this app's task, so create
+		// This activity is NOT part of this app's task, so create
 		// a new task when navigating up, with a synthesized back stack.
-		if(NavUtils.shouldUpRecreateTask(this, upIntent)){
-			//Add all of this activity's parents to the back stack and navigate to the closest parent
-			TaskStackBuilder.create(this).addNextIntentWithParentStack(upIntent).startActivities();
-		}else{//This activity is part of this app's task, so simply navigate up to the logical parent
+		if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+			// Add all of this activity's parents to the back stack and navigate
+			// to the closest parent
+			TaskStackBuilder.create(this)
+					.addNextIntentWithParentStack(upIntent).startActivities();
+		} else {// This activity is part of this app's task, so simply navigate
+				// up to the logical parent
 			NavUtils.navigateUpTo(this, upIntent);
 		}
 	}
